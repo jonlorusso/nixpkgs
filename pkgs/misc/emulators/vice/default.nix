@@ -1,4 +1,4 @@
-{ stdenv, fetchurl, bison, flex, perl, libpng, giflib, libjpeg, alsaLib, readline, libGLU_combined, libXaw
+{ lib, stdenv, fetchurl, bison, flex, perl, libpng, giflib, libjpeg, alsaLib, readline, libGLU_combined, libXaw
 , pkgconfig, gtk2, SDL, autoreconfHook, makeDesktopItem
 }:
 
@@ -10,10 +10,12 @@ stdenv.mkDerivation rec {
     sha256 = "0h0jbml02s2a36hr78dxv1zshmfhxp1wadpcdl09aq416fb1bf1y";
   };
 
-  buildInputs = [ bison flex perl libpng giflib libjpeg alsaLib readline libGLU_combined
-    pkgconfig gtk2 SDL autoreconfHook libXaw ];
+  buildInputs = [ bison flex perl libpng giflib libjpeg readline libGLU_combined
+    pkgconfig gtk2 SDL autoreconfHook libXaw ] ++
+    lib.optionals stdenv.isLinux [ alsaLib ];
+
   dontDisableStatic = true;
-  configureFlags = [ "--enable-fullscreen --enable-gnomeui" ];
+  configureFlags = [ "--enable-fullscreen" ] ++ lib.optionals stdenv.isLinux [ " --enable-gnomeui" ];
 
   desktopItem = makeDesktopItem {
     name = "vice";
@@ -48,6 +50,6 @@ stdenv.mkDerivation rec {
     homepage = http://www.viceteam.org;
     license = stdenv.lib.licenses.gpl2Plus;
     maintainers = [ stdenv.lib.maintainers.sander ];
-    platforms = stdenv.lib.platforms.linux;
+    platforms = stdenv.lib.platforms.linux ++ stdenv.lib.platforms.darwin;
   };
 }
